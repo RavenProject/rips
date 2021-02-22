@@ -1,0 +1,16 @@
+<pre>
+RIP: Draft
+Title: Asset Creation Burn to Miners
+Authors: WhaleStreet
+Status: Draft
+Type: Process
+Created: 2021-02-21
+</pre>
+
+==Abstract==
+This RIP proposes to reward miners with the coins that are burned when creating assets.
+
+==Motivation==
+Asset creation costs, that are rewarded to miners, create an additional incentive to mine RVN. Additionally, RVN has a hard-cap on supply, making it best to not burn coins, and keep them around for future asset creation.
+
+At the moment there are proposals on other blockchains (EIP 1559) to burn coins and play with the monetary supply. This presents an opportunity for RVN to eliminate burning, in contrast to these other blockchain proposals -- further incentivizing miners to switch to mining RVN.
