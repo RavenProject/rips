@@ -1,0 +1,251 @@
+<b>Extended Ravencoin Metadata Specification</b>
+<pre>
+RIP: 16
+Title: RIP 16 Extended Ravencoin Metadata Specification
+Authors: Realbokito
+Status: Draft
+Type: Process
+Reference Implementation: https://github.com/RealBokito/Extended-Ravencoin-Meta data-Specification
+Created: 2019-09-14
+Last Update: 2021-04-16
+</pre>
+
+==Abstract==
+RIP 16 Extended Ravencoin Metadata Specification’s objective is to increase the value and quality of metadata related to assets issued on the Ravencoin blockchain. It proposes a more structured way of describing assets by utilizing pre-defined schemas developed by the community and the users of the blockchain.
+
+==Motivation==
+RIP 16 Extended Ravencoin Metadata Specification is a proposal to extend the current Ravencoin Metadata Specification by Tron Black July 24, 2018.
+The metadata currently stored on IPFS and linked to assets issued on the Ravencoin blockchain consist of multiple non-required fields. The current specification does have drawbacks, including:
+
+*	Risk of low quality metadata about assets issued on the blockchain.
+*	Unclarity on which information may be useful to use for certain type of assets , such as but not limited to securities, stocks, bonds, real-estate and contracts.
+*	Unreadable metadata resources due to incorrect use of the JSON specification.
+
+The RIP16 Extended Ravencoin Metadata Specification:
+*	will include a way to implement a modular schema system into the Ravencoin Metadata specification. 
+*	proposes the development of multiple schemas for various types of assets (e.g. books, toys, paintings, invoices and warranty documents and registrations) in order to help improve the quality of metadata related to assets issued on the blockchain.
+*	proposes to implement and use a validation mechanism based on predefined metadata schemas into Ravencoin Core, wallets and asset explorers on a voluntary basis
+*	proposes the development and use of online Ravencoin Metadata generators to create, store and utilize high quality structured information in a more consistent manner.
+
+To objective is to setup a collaborative, community supported development with a mission to create, maintain and promote schemas for structured data on blockchains, e.g. Ravencoin.
+
+==Current Metadata Specification==
+The following Ravencoin Metadata structure as proposed by Tron Black on July 24, 2018 is considered to be valid:
+<pre>
+{
+   "name": "Yaris",
+   "issuer": "Toyota",
+   "description": "Toyota Yaris",
+   "forsale": true,
+   "forsale_price": "5000 RVN"
+}
+
+</pre>
+
+==Methodology==
+The RIP16 Extended Ravencoin Metadata Specification consists of two types of JSON resources:
+*	JSON structured Ravencoin Metadata Schemas which describes the structure of a certain set of meta data,
+*	JSON structured Ravencoin Metadata resources which describes the details of an asset using one or more Ravencoin Metadata schemas.
+
+==Metadata Schemas==
+Metadata Schemas describe the set of (required) fields and data types used. Each Key/Value pair in the schema describes the name and data type of a field and whether it is required. The following Metadata Schema describes the asset CAR:
+<pre>
+{
+   "schema": “CAR”,
+   "version": 0.1,
+   "model": {
+                    “type”: “string”,
+                     “required”: 1
+                    },
+   "manufacturer":  {
+                     “type”: “string”,
+                     “required”: 1
+                    },
+   "buildyear":  {
+                     “type”: “integer”,
+                     “required”: 1
+                    },
+   "licenseplate":  {
+                     “type”: “regex”,
+                     “required”: 1,
+                     “expr”:”UNDER DEVELOPMENT!”
+                    },
+   "bodytype":  {
+                     “type”: “string”,
+                     “required”: 0
+                    },
+   "co2emissions":  {
+                     “type”: “integer”,
+                     “required”: 0
+                    },
+   "fuelcapacity": {
+                     “type”: “integer”,
+                     “required”: 0
+                    }
+}
+</pre>
+
+==Schema & Version==
+Each schema can be referenced by its schema name and version number.
+The <b>Schema</b> field indicates which schema has been used to describe the asset in more detail.
+The <b>Version</b> field indicates which version of a schema has been used. Different version numbers will allow for future updates of schemas while providing backward compatibility for those who like to support it. The version numbering follows the major and minor versioning of schema files, e.g. 0.1, 1.5 and 2.0.
+Combined, the schema and version number indicates which set of (required) fields and data types has been used.
+When stored as individual files, the following naming convention is advised: asset_data_0.1.json, ipfs_attachments_1.1.json and car_0.1.json. This will provide developers the ability to dynamically load the appropriate Ravencoin Metadata Schema file in order to validate and display the metadata in a wallet, explorer or other platform/solution.
+
+==Nested Fields==
+Some situations require the use of nested fields, e.g. addresses. Schema files indicate nested fields inside a  valid JSON object that holds any number of child-fields or nested fields.
+In the example below the admin_data schema has a physical_address-field:
+<pre>
+{
+  "schema":"admin_data",
+  "version": 0.1,
+  "physical_address": {
+	"street_address1": {
+		"required":1,
+		"type": "string"
+	},
+	"street_address2": {
+		"required":0,
+		"type": "string"
+	},
+	"city": {
+		"required":1,
+		"type": "string"
+	},
+  },
+}
+</pre>
+
+==Schema Usage==
+The usage of a specific metadata schema can be indicated by including the following schema and version fields: 
+<pre>
+{
+   “schema”:”CAR”,
+   “version”: “0.1”,
+    …….
+}
+</pre>
+
+==Single Schema Usage==
+In continuation of the above CAR metadata schema example the following JSON object describes a car with all the appropriate fields:
+<pre>
+{
+   “schema”:”CAR”,
+   “version”: “0.1”,
+   "name": "Yaris",
+   "issuer": "Toyota",
+   "description": "Toyota Yaris",
+   "forsale": true,
+   "forsale_price": "5000 RVN",
+  "model": "Yaris",
+   "manufacturer": "Toyota",
+   "buildyear": "2019",
+   "licenseplate": “RU-092-Y”,
+   "bodytype": "hatchback",
+   "co2emissions": 0.2, 
+   "fuelcapacity": 75
+}
+</pre>
+Even when using the Extended Ravencoin Metadata System it remains possible to maintain the older Ravencoin Metadata fields for backwards compatibility. See Implementation, for more information.
+
+==Multiple Schema’s==
+RIP 16 Extended Ravencoin Metadata Specification allows for the use of multiple sets of metadata. In order to support multiple schemas all metadata JSON objects are to be encapsulated in an array with the name “extended”. Each JSON object inside this array is a single Ravencoin Metadata Schema object and includes all (required) fields as well as the name and version of the schema used.
+<pre>
+{
+	"extended": [
+		{
+			“schema”:”Schema name 1”,
+			“version”: “0.1”,
+			“fieldname1”:………., 
+			“fieldname2”:……….,
+			“fieldname3”:……….,
+		}, 
+		{
+			“schema”:”Schema name 2”,
+			“version”: “0.1”, 
+			“fieldname1”:………., 
+			“fieldname2”:……….,
+			“fieldname3”:……….,
+		},
+		………
+	]
+}
+</pre>
+It remains possible to maintain the older Ravencoin Metadata fields for backwards compatibility, alongside the extended array field.
+
+==External Resources==
+External Resources provides for more flexibility. An external resource may hold metadata information stored on a different system or a different type of file, other than JSON. The support of external resources is advised when an issuer wants to use a different system or systems to store metadata instead of the currently supported IPFS network. It can also be used to redirect users to a website or file.
+The issuer can use the following fields to describe an external resource:
+*	external_resource (required): a URI to a structured Extended Ravencoin Metadata resource in JSON or a different type of file.
+When referencing a different type of file/resource such as a PDF file or HTML webpage the use of the external_mime and external_size field is advised and increases the chances of wallets or explorers to display the external resource. 
+*	external_mime (optional): the mimetype of the resource.
+*	external_size (optional): the size of the external resource. 
+*	external_schema (optional): an URI to a proprietary metadata schema (valid JSON required) used by the external resource.
+In order to allow wallets and asset explorers to understand the structure of the custom metadata. 
+
+The above keys will help developers with the detection of an external resource. Any valid combination of the above keys can be used and found in 1 or multiple JSON schema object(s) and is an indication of an external reference. However, whether or not you, the developer, decides to support External Resources is at your own discretion.
+The following example show three JSON Metadata Objects:
+*	Object 1. A normal JSON Metadata object
+*	Object 2. An external JSON Metadata object supporting an community supported Schema
+*	Object 3. An custom external JSON Metadata object with a reference to an external Schema
+
+<pre>
+{
+	"name": "tZero",
+	…………
+	"extended": [
+		{
+			“schema”:”Schema name 1”,
+			“version”: “0.1”,
+			“fieldname1”:………., 
+			“fieldname2”:……….,
+			“fieldname3”:……….,
+		}, 
+		{
+			“schema”:”sto_meta dataa”,
+			“version”: “0.1”, 
+			"external_resource": "https://www.tzero.com/sto-meta dataa.json",
+		},
+		{
+			“schema”:”tZero_Exchange_Custom”,
+			“version”: “0.1”, 
+			"external_resource": "https://www.tzero.com/exchange-meta dataa.json",
+			"external_mime": "text/json",
+			"external_size": 4, 
+			"external_schema ": "https://www.tzero.com/exchange-meta dataa-schema.json",
+			},
+		………
+	]
+}
+</pre>
+Note: The available prototype does not fully support external resources other than external metadata schemas and metadata files and is only supported within the extended section of a metadata file.
+
+==Supported Data Types==
+The prototype of the RIP 16 Extended Ravencoin Metadata Specification currently supports the following data types:
+*	String
+*	Integer
+*	Float
+*	Boolean
+
+Support is expected for:
+*	Array
+*	JSON
+*	fields with an expression (not really a data type)
+
+==Implementation==
+Reasons to implement and support RIP16 are:
+*	It lowers the bar for issuers by supplying predefined and validated schemas to chose from,
+*	It motivates issuers to provide for higher quality metadata linked to assets stored on the Ravencoin blockchain,
+*	It may stimulate the development of future RIPs and proposals which can or may utilize this structured way of storing Ravencoin Metadata, such as RIP 11.
+*	As part of RIP16 it is advised that that the community starts a SIG for developing various Ravencoin Metadata Schemas.
+
+==Developer Considerations==
+*	At https://github.com/RealBokito/Extended-Ravencoin-Metadata-Specification there is a Proof of Concept available which validates an Extended Ravencoin Metadata file using PHP.
+*	Developers of wallets who support the Ravencoin Asset Protocol, as well as asset explorers are free to implement the whole or parts of this RIP16 at their own discretion.
+*	Tools to generate valid metadata for assets are advised to dynamically load forms/screens based on the metadata schema files.
+*	Tools utilizing schemas to validate the metadata of an asset are advised to:
+**	Consider soft passing Unknown Fields. This is mainly for backward compatibility with the older Metadata Specification.
+**	Store Metadata Schemas as a separate JSON files with the following naming convention (assuming lower case only): schema-name_Schema-Version.json. Valid file names are: asset_data_0.1.json, ipfs_attachments_1.1.json and car_0.1.json.
+**	Dynamically load Metadata Schemas files during validation by using the “Schema” and “Version” fields.
+*	Nested fields should be able to hold multiple dimensions of other nested fields. A recursive algorithm during the validation process is considered a valid approach. While 2 to 5 levels seems reasonable, 10 or more levels might indicate incorrect use of the specification. However, it might also be an indicator of a possible use case scenario for which a new schema is required but yet to be developed. If needed, developers should take measures to prevent any possible issues when using recursion as part of the validation process.
+*	Legal and/or security issues should be considered while loading external resources.
